@@ -5,14 +5,6 @@ import java.util.regex.Pattern;
 public class main {
 
     static int remainingTries = 8;
-    // First wrong answer, draw the platform
-    // Second wrong answer, draw the head
-    // Third, draw the body
-    // Fourth, draw one arm out
-    // Fifth, draw the other arm,
-    // Sixth, draw one leg
-    // Seventh, draw the other leg
-    // Eighth, draw the noose and connect the head to the noose
     static boolean victory = false;
     static String randomWord = "";
     static ArrayList<String> correctGuessArray = new ArrayList<>();
@@ -68,11 +60,11 @@ public class main {
                 System.exit(0);
             } else {
 //                throws an error if it's anything other than y/Y or n/N
-                System.out.println("Not a valid answer. Please enter 'y' or 'n'");
+                System.out.println("Not a valid answer. y/n");
                 throw new CustomException();
             }
         } else {
-            System.out.println("Input is blank. Would you like to play again? Please enter 'y' or 'n'");
+            System.out.println("Input is blank. Would you like to play again? y/n");
             throw new CustomException();
         }
         validPlayAgain = true;
@@ -188,18 +180,13 @@ public class main {
         //generate random index and pull from our arrayList
         int index = (int) Math.floor(Math.random() * wordDatabase.size());
         randomWord = wordDatabase.get(index);
-        System.out.println("Debug mode: Our word is..." + randomWord);
     }
 
     public static void generateUnderscores(String str) {
-        System.out.println("Debug mode: Entered generateUnderscores.");
-
         //create an underscore for each character in the provided string
         for ( int i = 0; i <= str.length() - 1 ; i++) {
             correctGuessArray.add("_");
         }
-        System.out.println("Underscores added to array: ");
-        System.out.println(correctGuessArray);
     }
 
     public static void displayHangman() {
