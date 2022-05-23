@@ -22,21 +22,95 @@ public class main {
     static Boolean validGuess = false;
 
 
-    public static void main (String[] args) {
-        generateNewWord();
-        System.out.println("Our word is..." + randomWord);
-        displayHangman();
-        generateUnderscores(randomWord);
-        promptGuess();
-
+    public static void main(String[] args) {
+        startNewGame();
         resetGame();
     }
 
-//    public static void startNewGame() {
-//        while (remainingTries < 0 ) {
-//
-//        }
-//    }
+    public static void startNewGame() {
+        generateNewWord();
+        generateUnderscores(randomWord);
+
+        while (remainingTries > 0 && !victory) {
+            displayHangman();
+            promptGuess();
+        }
+
+        if (remainingTries == 0 && !victory) {
+            displayHangman();
+            promptReplay();
+        }
+    }
+
+    public static void promptReplay(){
+        System.out.println("Would you like to play again? y/n");
+        Scanner scan = new Scanner(System.in);
+        playAgain = scan.nextLine();
+
+        while (!validPlayAgain) {
+            try {
+                validPlayAgainCheck(playAgain);
+            } catch (CustomException e) {
+                playAgain = scan.nextLine();
+            }
+        }
+    }
+
+    static void validPlayAgainCheck(String playAgain) throws CustomException {
+//        check for empty string
+        if (playAgain != null && playAgain.length() > 0) {
+            if (playAgain.equals("y") || playAgain.equals("Y")) {
+                validPlayAgain = true;
+                resetGame();
+                startNewGame();
+            } else if (playAgain.equals("n") || playAgain.equals("N")) {
+                validPlayAgain = true;
+                System.exit(0);
+            } else {
+//                throws an error if it's anything other than y/Y or n/N
+                System.out.println("Not a valid answer. Please enter 'y' or 'n'");
+                throw new CustomException();
+            }
+        } else {
+            System.out.println("Input is blank. Would you like to play again? Please enter 'y' or 'n'");
+            throw new CustomException();
+        }
+        validPlayAgain = true;
+    }
+
+    public static void compareGuesstoWord(String guess) {
+        //check the char against the characters in the randomWord
+        for (int i = 0; i <= randomWord.length() - 1 ; i++) {
+
+            //if we find a match/matches, replace the underscores in the correctGuessArray
+            if (String.valueOf(randomWord.charAt(i)).equals(guess)) {
+
+                //using the index location, replace the underscores there with the guess
+                correctGuessArray.set(i, guess);
+            }
+        }
+
+        //if the guess is incorrect, then it's not in our correctGuess array
+        //add it to our incorrectGuessArray if it's not already there
+        if (!correctGuessArray.contains(guess) && !incorrectGuessArray.contains(guess)) {
+            incorrectGuessArray.add(guess);
+
+            //decrement the number of guesses left
+            remainingTries--;
+            System.out.println("Remaining Tries left:" + remainingTries);
+        }
+
+        //check for victory
+        victoryCheck();
+    }
+
+    public static void victoryCheck() {
+        if (remainingTries > 0 && !correctGuessArray.contains("_")) {
+            victory = true;
+            System.out.println("You win!");
+            promptReplay();
+        }
+    }
 
     public static void promptGuess() {
         validGuess = false;
@@ -51,6 +125,8 @@ public class main {
                 userGuess = scan.nextLine();
             }
         }
+        validGuess = true;
+        compareGuesstoWord(userGuess);
     }
 
     public static void validGuessCheck(String guess) throws CustomException {
@@ -80,12 +156,12 @@ public class main {
     public static void resetGame() {
         remainingTries = 8;
         victory = false;
-        generateNewWord();
         validGuess = false;
         correctGuessArray.clear();
         incorrectGuessArray.clear();
         playAgain = "";
         validPlayAgain = false;
+        startNewGame();
     }
 
     public static void generateNewWord() {
@@ -112,18 +188,18 @@ public class main {
         //generate random index and pull from our arrayList
         int index = (int) Math.floor(Math.random() * wordDatabase.size());
         randomWord = wordDatabase.get(index);
+        System.out.println("Debug mode: Our word is..." + randomWord);
     }
 
     public static void generateUnderscores(String str) {
-
-        String underscores = "";
+        System.out.println("Debug mode: Entered generateUnderscores.");
 
         //create an underscore for each character in the provided string
         for ( int i = 0; i <= str.length() - 1 ; i++) {
-            underscores += "_ ";
             correctGuessArray.add("_");
         }
-        System.out.println("                  " + underscores);
+        System.out.println("Underscores added to array: ");
+        System.out.println(correctGuessArray);
     }
 
     public static void displayHangman() {
@@ -152,6 +228,8 @@ public class main {
                                  |=|                                       |=|\s
                                  |=|                                       |=|\s
                                 <<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>""");
+                System.out.println(correctGuessArray);
+                System.out.println("Missed letters: " + incorrectGuessArray);
                 break;
             case 7:
                 System.out.println(
@@ -176,6 +254,8 @@ public class main {
                                  |=|  [=][=][=][=][=][=][=][=][=]{|}[=]    |=|\s
                                  |=|                                       |=|\s
                                 <<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>""");
+                System.out.println(correctGuessArray);
+                System.out.println("Missed letters: " + incorrectGuessArray);
                 break;
             case 6:
                 System.out.println(
@@ -200,6 +280,8 @@ public class main {
                                  |=|  [=][=][=][=][=][=][=][=][=]{|}[=]    |=|\s
                                  |=|                                       |=|\s
                                 <<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>""");
+                System.out.println(correctGuessArray);
+                System.out.println("Missed letters: " + incorrectGuessArray);
                 break;
             case 5:
                 System.out.println(
@@ -224,6 +306,8 @@ public class main {
                                  |=|  [=][=][=][=][=][=][=][=][=]{|}[=]    |=|\s
                                  |=|                                       |=|\s
                                 <<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>""");
+                System.out.println(correctGuessArray);
+                System.out.println("Missed letters: " + incorrectGuessArray);
                 break;
             case 4:
                 System.out.println(
@@ -248,6 +332,8 @@ public class main {
                                  |=|  [=][=][=][=][=][=][=][=][=]{|}[=]    |=|\s
                                  |=|                                       |=|\s
                                 <<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>""");
+                System.out.println(correctGuessArray);
+                System.out.println("Missed letters: " + incorrectGuessArray);
             case 3:
                 System.out.println(
                         """
@@ -271,6 +357,8 @@ public class main {
                                  |=|  [=][=][=][=][=][=][=][=][=]{|}[=]    |=|\s
                                  |=|                                       |=|\s
                                 <<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>""");
+                System.out.println(correctGuessArray);
+                System.out.println("Missed letters: " + incorrectGuessArray);
                 break;
             case 2:
                 System.out.println(
@@ -297,6 +385,8 @@ public class main {
                                  |=|  [=][=][=][=][=][=][=][=][=]{|}[=]    |=|\s
                                  |=|                                       |=|\s
                                 <<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>""");
+                System.out.println(correctGuessArray);
+                System.out.println("Missed letters: " + incorrectGuessArray);
                 break;
             case 1:
                 System.out.println(
@@ -323,6 +413,8 @@ public class main {
                                  |=|  [=][=][=][=][=][=][=][=][=]{|}[=]    |=|\s
                                  |=|                                       |=|\s
                                 <<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>""");
+                System.out.println(correctGuessArray);
+                System.out.println("Missed letters: " + incorrectGuessArray);
                 break;
             case 0:
                 System.out.println("""
@@ -346,6 +438,9 @@ public class main {
                              |=|  [=][=][=][=][=][=][=][=][=]{|}[=]    |=|\s
                              |=|                                       |=|\s
                             <<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>-<<0>>""");
+                System.out.println(correctGuessArray);
+                System.out.println("Missed letters: " + incorrectGuessArray);
+                System.out.println("You lose!");
                 break;
         }
     }
